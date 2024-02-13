@@ -1,4 +1,4 @@
-from vis_net.visual_github_network import *
+from graph.helper.visual_github_network import *
 import requests
 import sys
 

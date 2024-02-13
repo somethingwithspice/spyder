@@ -1,5 +1,6 @@
 import github_users.style
 
+
 def main_menu():
     options = 3 # Make sure to change this appropriately
 
@@ -18,13 +19,15 @@ def main_menu():
     print("\n")
     print(f"\t{github_users.style.style.red}[1]{github_users.style.style.end} Accumulate GitHub Accounts")
     print(f"\t{github_users.style.style.red}[2]{github_users.style.style.end} Scan GitHub Accounts")
-    print(f"\t{github_users.style.style.red}[3]{github_users.style.style.end} Get Help")
+    print(f"\t{github_users.style.style.red}[3]{github_users.style.style.end} GiHub Visual Graph")
+    print(f"\t{github_users.style.style.red}[4]{github_users.style.style.end} Get Help")
+
     print()
     while True:
         user_input = input("Select: ")
         try:
             number = int(user_input)
-            if number <= 0 or number > 3:
+            if number <= 0 or number > options:
                 print(f"{github_users.style.style.red}Input must be between 1 and {options}{github_users.style.style.end}")    
             else:
                 return number
