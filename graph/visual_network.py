@@ -1,20 +1,24 @@
 from graph.helper.visual_github_network import *
-import requests
+from graph.helper.html_handler import *
 import sys
 
 
+def sub_users_help(main_account_asoc_users, length_sub_usrs):
+    graphs = []
 
-def get_users(main_account, type_):
-
-    users = []
+    for x in range(length_sub_usrs):
+        sub_following = get_users(main_account_asoc_users[x], "following")
+        sub_followers = get_users(main_account_asoc_users[x], "followers")
+   
+        if len(sub_following) > 300:
+            sub_following = sub_following[:299]
+        if len(sub_followers) > 300:
+            sub_followers = sub_followers[:299]
+        
+        graphs.append(create_graph(main_account_asoc_users[x], sub_followers, sub_following))
     
-    req = requests.get(f"https://api.github.com/users/{main_account}/{type_}")
-    result = req.json()
-
-    for x in result:
-        users.append(x['login'])
-    
-    return users
+    return graphs
+ 
 
 def graph_depth_two():
     user = input("Give GitHub Account: ")
@@ -27,32 +31,15 @@ def graph_depth_two():
     len_following = len(following)
     len_followers = len(followers)
     
-    if len_following > 60 or len_followers > 60:
+    if len_following > 100 or len_followers > 100:
         print(f"Followers: {len_followers}  Following: {len_following}")
         user_input = input("Are you sure you want to continue? [y/n] ")
         if user_input.upper() not in ["Y", "YE", "YES", "YEA", "YEAH", "OK", "OKAY"]:
             sys.exit()
     
     graphs = []
-    for x in range(len_following):
-        sub_following = get_users(following[x], "following")
-        sub_followers = get_users(following[x], "followers")
-    
-        if len(sub_following) < 60 and len(sub_followers) < 60:
-            graphs.append(create_graph(following[x], sub_followers, sub_following))
-        else:
-            graphs.append(create_graph(following[x], sub_followers[:59], sub_following[:59]))
-    
-    for x in range(len_followers):
-        sub_following = get_users(followers[x], "following")
-        sub_followers = get_users(followers[x], "followers")
-        
-        if len(sub_following) < 60 and len(sub_followers) < 60:
-            graphs.append(create_graph(followers[x], sub_followers, sub_following))
-        else:
-            graphs.append(create_graph(followers[x], sub_followers[:59], sub_following[:59]))
-    
-    
+    graphs.extend(sub_users_help(following, len_following))
+    graphs.extend(sub_users_help(followers, len_followers)) 
     
     graph = combine_graphs(graphs)
     draw_graph(graph)
