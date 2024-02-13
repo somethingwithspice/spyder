@@ -2,25 +2,43 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
+
+
 def create_graph(main_account, followers, following):
-    
     G = nx.Graph()
 
-    G.add_node(main_account, color="lightgreen")
-    
-    both = set(followers) & set(following)
+    # Initially add the main account with a temporary color
+    G.add_node(main_account, color="temp")
 
+    # Track mutual relationships
+    mutuals = set(followers) & set(following)
+
+    # Add followers
     for follower in followers:
-        color = 'purple' if follower in both else 'lightblue'
+        color = 'purple' if follower in mutuals else 'lightblue'
         G.add_node(follower, color=color)
         G.add_edge(main_account, follower)
 
+    # Add following
     for following_ in following:
-        if following_ not in G.nodes(): 
-            G.add_node(following_, color='red')
+        color = 'purple' if following_ in mutuals else 'red'
+        # Check if the node exists to possibly update the color to purple
+        if following_ in G.nodes():
+            G.nodes[following_]['color'] = color
+        else:
+            G.add_node(following_, color=color)
         G.add_edge(main_account, following_)
 
+    # Update the main account color last to ensure it's accurate
+    # If the main account has mutual relationships, set it to purple
+    if main_account in mutuals:
+        G.nodes[main_account]['color'] = 'purple'
+    else:
+        G.nodes[main_account]['color'] = 'lightgreen'
+
     return G
+
+
 
 def combine_graphs(graphs):
     combined_graph = nx.Graph()
